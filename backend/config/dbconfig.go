@@ -1,7 +1,7 @@
 package config
 
 import (
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 var db *gorm.DB
@@ -35,7 +33,7 @@ type DBConfig struct {
 // InitConnection init connection
 func InitConnection() {
 	var err error
-	db, err = gorm.Open(mysql.Open(DbURL(BuildDBConfig())), &gorm.Config{
+	db, err = gorm.Open(postgres.Open(DbURL(BuildDBConfig())), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
@@ -48,10 +46,6 @@ func InitConnection() {
 
 // BuildDBConfig load config from file
 func BuildDBConfig() *DBConfig {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 	return &DBConfig{
 		Host:     os.Getenv("DB_HOST"),
 		User:     os.Getenv("DB_USER"),
@@ -63,9 +57,9 @@ func BuildDBConfig() *DBConfig {
 
 // DbURL build connection string
 func DbURL(dbConfig *DBConfig) string {
-	// dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+	//   dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%s)/%s",
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,

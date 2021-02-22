@@ -1,21 +1,12 @@
 package main
 
 import (
-	"backend/migrations"
-
-	"github.com/gofiber/fiber/v2"
+	"fmt"
+	httpclient "shopee-crawler/http-client"
 )
 
 func main() {
-	// config.GetDbConnection()
-	migrations.Migrate()
-	// helpers.GetCategory("https://shopee.vn/api/v4/official_shop/get_categories?tab_type=1")
-	app := fiber.New()
-	app.Static("/", "./public")
-
-	app.Get("/api", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
-
-	app.Listen(":3001")
+	client := httpclient.NewShopeeClient()
+	body, err := client.Get("http://shopee.vn/api/v2/item/get?itemid=5610905722&shopid=65589552")
+	fmt.Println(string(body), err)
 }
