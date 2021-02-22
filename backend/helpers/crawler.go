@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var dbConnection *gorm.DB
+
 //MakeRequest ...
 func MakeRequest(url string) ([]byte, error) {
 
@@ -52,9 +54,9 @@ func GetCategory(url string) {
 	// conn.db.Create(&s)
 }
 
-// func main() {
-// 	s := string(`{"operation": "get", "key": "example"}`)
-//    data := Request{}
-//    json.Unmarshal([]byte(s), &data)
-//    fmt.Printf("Operation: %s", data.Operation)
-// }
+func Save(category models.Category) error {
+	if err := dbConnection.Create(&category).Error; err != nil {
+		return err
+	}
+	return nil
+}

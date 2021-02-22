@@ -117,7 +117,7 @@ type Item struct {
 	ShowOriginalGuarantee                 bool            `json:"show_original_guarantee"`
 	AddOnDealInfo                         interface{}     `json:"add_on_deal_info"`
 	IsNonCcInstallmentPaymentEligible     bool            `json:"is_non_cc_installment_payment_eligible"`
-	Categories                            []CategoryItem  `json:"categories" gorm:"foreignKey:Category"`
+	Categories                            []CategoryItem  `json:"categories"`
 	Ctime                                 int             `json:"ctime"`
 	Name                                  string          `json:"name"`
 	ShowShopeeVerifiedLabel               bool            `json:"show_shopee_verified_label"`
