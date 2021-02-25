@@ -1,7 +1,7 @@
 package config
 
 import (
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -33,7 +33,7 @@ type DBConfig struct {
 // InitConnection init connection
 func InitConnection() {
 	var err error
-	db, err = gorm.Open(postgres.Open(DbURL(BuildDBConfig())), &gorm.Config{
+	db, err = gorm.Open(mysql.Open(DbURL(BuildDBConfig())), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
