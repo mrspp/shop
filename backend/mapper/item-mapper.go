@@ -52,6 +52,9 @@ func ItemDTOToEntity(itemDTO dto.ItemDTO) entity.Item {
 func ItemDTOsToEntities(itemDTOs []dto.ItemDTO) []entity.Item {
 	items := make([]entity.Item, 0)
 	for _, i := range itemDTOs {
+		if i.Price%priceUnit != 0 {
+			continue
+		}
 		items = append(items, ItemDTOToEntity(i))
 	}
 	return items

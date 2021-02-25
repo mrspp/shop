@@ -57,6 +57,10 @@ func (i *itemCrawler) crawlItemByShop(url string, shopID int) error {
 		if err != nil {
 			return err
 		}
+		itemEntities := mapper.ItemDTOsToEntities(itemRS.Items)
+		if len(itemEntities) == 0 {
+			continue
+		}
 		i.itemRepo.SaveAll(mapper.ItemDTOsToEntities(itemRS.Items))
 		stopCrawl = itemRS.Nomore
 		offset += step
