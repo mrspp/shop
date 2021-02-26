@@ -15,6 +15,7 @@ type ShopRepo interface {
 	Save(shop entity.Shop) error
 	SaveAll(shops []entity.Shop) error
 	FindAll() ([]entity.Shop, error)
+	FindByIDWithItems(shopID int) (*entity.Shop, error)
 }
 
 type shopRepo struct {
@@ -42,6 +43,14 @@ func (s *shopRepo) FindAll() ([]entity.Shop, error) {
 		return nil, err
 	}
 	return shops, nil
+}
+
+func (s *shopRepo) FindByIDWithItems(shopID int) (*entity.Shop, error) {
+	var shop entity.Shop
+	if err := s.db.Where("id = ?", shopID).Preload("Items").First(&shop).Error; err != nil {
+		return nil, err
+	}
+	return &shop, nil
 }
 
 // GetShopRepo ...

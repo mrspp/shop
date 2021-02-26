@@ -28,3 +28,15 @@ func ShopDTOsToShopEntities(shopDTOs []dto.ShopDTO) []entity.Shop {
 	}
 	return shopEntities
 }
+
+// ShopEntityToCacheDTO ...
+func ShopEntityToCacheDTO(shopEntity *entity.Shop) dto.ShopCacheDTO {
+	shopCache := dto.ShopCacheDTO{
+		ShopID: shopEntity.ID,
+		Items:  make(map[int64]int64),
+	}
+	for _, i := range shopEntity.Items {
+		shopCache.Items[i.ID] = i.Price
+	}
+	return shopCache
+}
