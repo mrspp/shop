@@ -1,45 +1,35 @@
 package pubsub
 
 import (
-	"fmt"
-	"os"
+	"log"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/Shopify/sarama"
 )
 
 // Publish ...
-func Publish() {
+func Publish(data string) {
 	broker := "server-dev:9092"
 	topic := "shopee_crawling"
 
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": broker})
-
+	producer, err := sarama.NewSyncProducer([]string{broker}, nil)
 	if err != nil {
-		fmt.Printf("Failed to create producer: %s\n", err)
-		os.Exit(1)
+		log.Fatalln(err)
 	}
+	defer func() {
+		if err := producer.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}()
 
-	fmt.Printf("Created Producer %v\n", p)
-
-	// Optional delivery channel, if not specified the Producer object's
-	// .Events channel is used.
-	deliveryChan := make(chan kafka.Event)
-
-	value := "Hello Go!"
-	err = p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-		Value:          []byte(value),
-		Headers:        []kafka.Header{{Key: "myTestHeader", Value: []byte("header values are binary")}},
-	}, deliveryChan)
-
-	e := <-deliveryChan
-	m := e.(*kafka.Message)
-
-	if m.TopicPartition.Error != nil {
-		fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
+	msg := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.ByteEncoder(data),
+	}
+	partition, offset, err := producer.SendMessage(msg)
+	if err != nil {
+		log.Printf("FAILED to send message: %s\n", err)
 	} else {
-		fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
-			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
+		log.Printf("> message sent to partition %d at offset %d\n", partition, offset)
 	}
 
 }
