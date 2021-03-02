@@ -2,34 +2,41 @@ package pubsub
 
 import (
 	"log"
+	"shopee-crawler/config"
+	"shopee-crawler/dto"
 
 	"github.com/Shopify/sarama"
 )
 
-// Publish ...
-func Publish(data string) {
-	broker := "server-dev:9092"
-	topic := "shopee_crawling"
+var publisherInstance *publisher
 
-	producer, err := sarama.NewSyncProducer([]string{broker}, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func() {
-		if err := producer.Close(); err != nil {
-			log.Fatalln(err)
+// Publisher ...
+type Publisher interface {
+	Publish(objType, topic string, data interface{}) error
+}
+
+type publisher struct {
+	producer sarama.SyncProducer
+}
+
+// GetPublisher ...
+func GetPublisher() Publisher {
+	if publisherInstance == nil {
+		publisherInstance = &publisher{
+			config.GetSyncProducer(),
 		}
-	}()
-
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.ByteEncoder(data),
 	}
-	partition, offset, err := producer.SendMessage(msg)
+	return publisherInstance
+}
+
+// Publish ...
+func (p *publisher) Publish(objType, topic string, data interface{}) error {
+	msg := dto.BuildMessageDTO(objType, topic, data)
+	partition, offset, err := p.producer.SendMessage(&msg.Msg)
 	if err != nil {
 		log.Printf("FAILED to send message: %s\n", err)
 	} else {
 		log.Printf("> message sent to partition %d at offset %d\n", partition, offset)
 	}
-
+	return err
 }

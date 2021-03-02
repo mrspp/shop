@@ -1,12 +1,9 @@
 package crawler
 
 import (
-	"encoding/json"
 	"fmt"
-	"shopee-crawler/dto"
-	"shopee-crawler/mapper"
-	"shopee-crawler/repository"
-	"shopee-crawler/utils"
+	"os"
+	"shopee-crawler/pubsub"
 	"shopee-crawler/utils/constant"
 	httpclient "shopee-crawler/utils/http-client"
 )
@@ -14,16 +11,14 @@ import (
 var shopCrwalerInstance *shopCrwaler
 
 type shopCrwaler struct {
-	categoryRepo repository.CategoryRepo
-	shopRepo     repository.ShopRepo
+	publisher pubsub.Publisher
 }
 
 // GetShopCrawler ...
 func GetShopCrawler() Crawler {
 	if shopCrwalerInstance == nil {
 		shopCrwalerInstance = &shopCrwaler{
-			repository.GetCategoryRepo(),
-			repository.GetShopRepo(),
+			pubsub.GetPublisher(),
 		}
 	}
 	return shopCrwalerInstance
@@ -31,16 +26,17 @@ func GetShopCrawler() Crawler {
 
 // Crawl ...
 func (s *shopCrwaler) Crawl() error {
-	categories, err := s.categoryRepo.FindAll()
-	if err != nil {
-		return err
-	}
-	for _, c := range categories {
-		if err := s.crawlShop(constant.ListAllShopByCategoryURL, c.ID); err != nil {
-			return err
-		}
-		utils.RandomSleep()
-	}
+	// TODO: List all
+	// categories, err := s.categoryRepo.FindAll()
+	// if err != nil {
+	// 	return err
+	// }
+	// for _, c := range categories {
+	// 	if err := s.crawlShop(constant.ListAllShopByCategoryURL, c.ID); err != nil {
+	// 		return err
+	// 	}
+	// 	utils.RandomSleep()
+	// }
 	return nil
 }
 
@@ -51,16 +47,7 @@ func (s *shopCrwaler) crawlShop(url string, categoryID int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(resp))
-	var shopRS dto.ShopResponse
-	err = json.Unmarshal(resp, &shopRS)
-	category, err := s.categoryRepo.FindByID(categoryID)
-	if err != nil {
-		return err
-	}
 
-	category.Shops = append(category.Shops, mapper.ShopDTOsToShopEntities(shopRS.Data.OfficialShops)...)
-	s.categoryRepo.Save(*category)
+	return s.publisher.Publish(constant.SHOP_TYPE, os.Getenv("KAFKA_TOPIC"), resp)
 
-	return nil
 }

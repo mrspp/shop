@@ -1,27 +1,57 @@
 package dto
 
-import "github.com/Shopify/sarama"
+import (
+	"encoding/json"
+	"log"
+
+	"github.com/Shopify/sarama"
+)
 
 // MessageDTO ...
-type MessageDTO *sarama.ProducerMessage
-
-// SetValue ...
-func (m *MessageDTO) SetValue(value []byte) {
-	m.Value = sarama.ByteEncoder(value)
+type MessageDTO struct {
+	Msg sarama.ProducerMessage
 }
 
-// AddObjectType ...
-func (m *MessageDTO) AddObjectType(objType []byte) {
-	if m.Headers == nil {
-		m.Headers = []sarama.RecordHeader{
+// SetValue ...
+func (m *MessageDTO) SetValue(value interface{}) error {
+	byteVal, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	b := sarama.ByteEncoder(byteVal)
+	m.Msg.Value = b
+
+	return nil
+}
+
+// SetObjectType ...
+func (m *MessageDTO) SetObjectType(objType []byte) {
+	if m.Msg.Headers == nil {
+		m.Msg.Headers = []sarama.RecordHeader{
 			{
 				Key:   []byte("type"),
 				Value: objType,
 			},
 		}
+		return
 	}
-	m.Headers = append(m.Headers, sarama.RecordHeader{
+	m.Msg.Headers = append(m.Msg.Headers, sarama.RecordHeader{
 		Key:   []byte("type"),
 		Value: objType,
 	})
+}
+
+// BuildMessageDTO ...
+func BuildMessageDTO(header, topic string, data interface{}) MessageDTO {
+	msg := MessageDTO{
+		Msg: sarama.ProducerMessage{
+			Topic: topic,
+		},
+	}
+	err := msg.SetValue(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	msg.SetObjectType([]byte("category"))
+	return msg
 }

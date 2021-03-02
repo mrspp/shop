@@ -1,12 +1,13 @@
 package main
 
 import (
-	"shopee-crawler/pubsub"
+	"shopee-crawler/crawler"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// godotenv.Load(".env")
 	// utils.Mirgrate()
-	// crawler.CrawlChain()
-	pubsub.Publish("alo alo 123")
+	godotenv.Load()
+	crawler.CrawlChain()
 }

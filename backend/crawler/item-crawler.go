@@ -3,9 +3,9 @@ package crawler
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"shopee-crawler/dto"
-	"shopee-crawler/mapper"
-	"shopee-crawler/repository"
+	"shopee-crawler/pubsub"
 	"shopee-crawler/utils"
 	"shopee-crawler/utils/constant"
 	httpclient "shopee-crawler/utils/http-client"
@@ -14,31 +14,29 @@ import (
 var itemCrawlerInstance *itemCrawler
 
 type itemCrawler struct {
-	shopRepo repository.ShopRepo
-	itemRepo repository.ItemRepo
+	publisher pubsub.Publisher
 }
 
 // GetItemCrawler ...
 func GetItemCrawler() Crawler {
 	if itemCrawlerInstance == nil {
 		itemCrawlerInstance = &itemCrawler{
-			repository.GetShopRepo(),
-			repository.GetItemRepo(),
+			pubsub.GetPublisher(),
 		}
 	}
 	return itemCrawlerInstance
 }
 func (i *itemCrawler) Crawl() error {
-	shops, err := i.shopRepo.FindAll()
-	if err != nil {
-		return err
-	}
-	for _, s := range shops {
-		if err := i.crawlItemByShop(constant.ListAllItemByShopURL, s.ID); err != nil {
-			return err
-		}
-		utils.RandomSleep()
-	}
+	// shops, err := i.shopRepo.FindAll()
+	// if err != nil {
+	// 	return err
+	// }
+	// for _, s := range shops {
+	// 	if err := i.crawlItemByShop(constant.ListAllItemByShopURL, s.ID); err != nil {
+	// 		return err
+	// 	}
+	// 	utils.RandomSleep()
+	// }
 	return nil
 }
 func (i *itemCrawler) crawlItemByShop(url string, shopID int) error {
@@ -57,11 +55,7 @@ func (i *itemCrawler) crawlItemByShop(url string, shopID int) error {
 		if err != nil {
 			return err
 		}
-		itemEntities := mapper.ItemDTOsToEntities(itemRS.Items)
-		if len(itemEntities) == 0 {
-			continue
-		}
-		i.itemRepo.SaveAll(mapper.ItemDTOsToEntities(itemRS.Items))
+		i.publisher.Publish(constant.ITEM_TYPE, os.Getenv("KAFKA_TOPIC"), resp)
 		stopCrawl = itemRS.Nomore
 		offset += step
 		utils.RandomSleep()

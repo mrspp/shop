@@ -1,6 +1,7 @@
 package httpclient
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -28,6 +29,10 @@ func (s shopeeClient) Get(url string) ([]byte, error) {
 	response, err := client.Do(rq)
 	if err != nil {
 		return []byte{}, err
+	}
+	if response.StatusCode != 200 {
+		errMsg, _ := ioutil.ReadAll(response.Body)
+		return []byte{}, errors.New(string(errMsg))
 	}
 	return ioutil.ReadAll(response.Body)
 
