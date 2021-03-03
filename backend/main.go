@@ -9,5 +9,5 @@ import (
 func main() {
 	// utils.Mirgrate()
 	godotenv.Load()
-	crawler.CrawlChain()
+	crawler.GetItemCrawler().Crawl()
 }

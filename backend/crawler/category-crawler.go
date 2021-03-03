@@ -27,7 +27,7 @@ func GetCategoryCrawler() Crawler {
 // Crawl ...
 func (c *categoryCrawler) Crawl() error {
 	client := httpclient.NewShopeeClient()
-	jsonRespone, err := client.Get(constant.ListAllShopeeCategoryURL)
+	jsonRespone, err := client.Get(constant.ListAllCategoryURL)
 	if err != nil {
 		log.Println(err)
 		return err

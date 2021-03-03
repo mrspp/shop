@@ -2,10 +2,9 @@ package dto
 
 // ShopDTO ...
 type ShopDTO struct {
-	Userid           int    `json:"userid"`
 	Username         string `json:"username"`
+	Name             string `json:"brand_name"`
 	Shopid           int    `json:"shopid"`
-	ShopName         string `json:"shop_name"`
 	Logo             string `json:"logo"`
 	LogoPc           string `json:"logo_pc"`
 	ShopCollectionID int    `json:"shop_collection_id"`
@@ -13,10 +12,17 @@ type ShopDTO struct {
 	BrandLabel       int    `json:"brand_label"`
 }
 
+// ShopIndex ...
+type ShopIndex struct {
+	Index string    `json:"index"`
+	Total int       `json:"total"`
+	Shops []ShopDTO `json:"brand_ids"`
+}
+
 // ShopData ...
 type ShopData struct {
-	Total         int       `json:"total"`
-	OfficialShops []ShopDTO `json:"official_shops"`
+	ShopIndexes []ShopIndex `json:"brands"`
+	Total       int         `json:"brand_count"`
 }
 
 // ShopResponse ...

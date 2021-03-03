@@ -14,10 +14,16 @@ type MessageDTO struct {
 
 // SetValue ...
 func (m *MessageDTO) SetValue(value interface{}) error {
-	byteVal, err := json.Marshal(value)
-	if err != nil {
-		return err
+	var byteVal []byte
+	var ok bool
+	var err error
+	if byteVal, ok = value.([]byte); !ok {
+		byteVal, err = json.Marshal(value)
+		if err != nil {
+			return err
+		}
 	}
+
 	b := sarama.ByteEncoder(byteVal)
 	m.Msg.Value = b
 
@@ -42,7 +48,7 @@ func (m *MessageDTO) SetObjectType(objType []byte) {
 }
 
 // BuildMessageDTO ...
-func BuildMessageDTO(header, topic string, data interface{}) MessageDTO {
+func BuildMessageDTO(objType, topic string, data interface{}) MessageDTO {
 	msg := MessageDTO{
 		Msg: sarama.ProducerMessage{
 			Topic: topic,
@@ -52,6 +58,7 @@ func BuildMessageDTO(header, topic string, data interface{}) MessageDTO {
 	if err != nil {
 		log.Fatal(err)
 	}
-	msg.SetObjectType([]byte("category"))
+
+	msg.SetObjectType([]byte(objType))
 	return msg
 }

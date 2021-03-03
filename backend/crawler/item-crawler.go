@@ -37,6 +37,11 @@ func (i *itemCrawler) Crawl() error {
 	// 	}
 	// 	utils.RandomSleep()
 	// }
+	// 15141
+
+	if err := i.crawlItemByShop(constant.ListAllItemByShopURL, 15141); err != nil {
+		return err
+	}
 	return nil
 }
 func (i *itemCrawler) crawlItemByShop(url string, shopID int) error {

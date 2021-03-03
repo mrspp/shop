@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"fmt"
 	"os"
 	"shopee-crawler/pubsub"
 	"shopee-crawler/utils/constant"
@@ -26,28 +25,11 @@ func GetShopCrawler() Crawler {
 
 // Crawl ...
 func (s *shopCrwaler) Crawl() error {
-	// TODO: List all
-	// categories, err := s.categoryRepo.FindAll()
-	// if err != nil {
-	// 	return err
-	// }
-	// for _, c := range categories {
-	// 	if err := s.crawlShop(constant.ListAllShopByCategoryURL, c.ID); err != nil {
-	// 		return err
-	// 	}
-	// 	utils.RandomSleep()
-	// }
-	return nil
-}
-
-func (s *shopCrwaler) crawlShop(url string, categoryID int) error {
 	client := httpclient.NewShopeeClient()
-	url = fmt.Sprintf(url, categoryID)
-	resp, err := client.Get(url)
+	resp, err := client.Get(constant.ListAllShopURL)
 	if err != nil {
 		return err
 	}
 
 	return s.publisher.Publish(constant.SHOP_TYPE, os.Getenv("KAFKA_TOPIC"), resp)
-
 }
