@@ -13,12 +13,16 @@ import (
 
 var itemCrawlerInstance *itemCrawler
 
+// ItemCrawler ...
+type ItemCrawler interface {
+	CrawlByShop(url string, shopID int) error
+}
 type itemCrawler struct {
 	publisher pubsub.Publisher
 }
 
 // GetItemCrawler ...
-func GetItemCrawler() Crawler {
+func GetItemCrawler() ItemCrawler {
 	if itemCrawlerInstance == nil {
 		itemCrawlerInstance = &itemCrawler{
 			pubsub.GetPublisher(),
@@ -26,25 +30,8 @@ func GetItemCrawler() Crawler {
 	}
 	return itemCrawlerInstance
 }
-func (i *itemCrawler) Crawl() error {
-	// shops, err := i.shopRepo.FindAll()
-	// if err != nil {
-	// 	return err
-	// }
-	// for _, s := range shops {
-	// 	if err := i.crawlItemByShop(constant.ListAllItemByShopURL, s.ID); err != nil {
-	// 		return err
-	// 	}
-	// 	utils.RandomSleep()
-	// }
-	// 15141
 
-	if err := i.crawlItemByShop(constant.ListAllItemByShopURL, 15141); err != nil {
-		return err
-	}
-	return nil
-}
-func (i *itemCrawler) crawlItemByShop(url string, shopID int) error {
+func (i *itemCrawler) CrawlByShop(url string, shopID int) error {
 	offset := 0
 	step := 100
 	stopCrawl := false

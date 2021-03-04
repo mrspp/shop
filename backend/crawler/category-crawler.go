@@ -10,12 +10,16 @@ import (
 
 var categoryCrawlerInstance *categoryCrawler
 
+// CategoryCrawler ...
+type CategoryCrawler interface {
+	Crawl() error
+}
 type categoryCrawler struct {
 	publisher pubsub.Publisher
 }
 
 // GetCategoryCrawler ...
-func GetCategoryCrawler() Crawler {
+func GetCategoryCrawler() CategoryCrawler {
 	if categoryCrawlerInstance == nil {
 		categoryCrawlerInstance = &categoryCrawler{
 			pubsub.GetPublisher(),

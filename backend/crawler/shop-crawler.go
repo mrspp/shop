@@ -13,8 +13,13 @@ type shopCrwaler struct {
 	publisher pubsub.Publisher
 }
 
+// ShopCrawler ...
+type ShopCrawler interface {
+	Crawl() error
+}
+
 // GetShopCrawler ...
-func GetShopCrawler() Crawler {
+func GetShopCrawler() ShopCrawler {
 	if shopCrwalerInstance == nil {
 		shopCrwalerInstance = &shopCrwaler{
 			pubsub.GetPublisher(),
