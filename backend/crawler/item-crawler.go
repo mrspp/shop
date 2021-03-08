@@ -15,7 +15,7 @@ var itemCrawlerInstance *itemCrawler
 
 // ItemCrawler ...
 type ItemCrawler interface {
-	CrawlByShop(url string, shopID int) error
+	CrawlByShop(shopID int) error
 }
 type itemCrawler struct {
 	publisher pubsub.Publisher
@@ -31,9 +31,10 @@ func GetItemCrawler() ItemCrawler {
 	return itemCrawlerInstance
 }
 
-func (i *itemCrawler) CrawlByShop(url string, shopID int) error {
+func (i *itemCrawler) CrawlByShop(shopID int) error {
 	offset := 0
 	step := 100
+	url := constant.ListAllItemByShopURL
 	stopCrawl := false
 	for !stopCrawl {
 		crawlURL := fmt.Sprintf(url, shopID, offset)
