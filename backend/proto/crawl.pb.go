@@ -4,7 +4,7 @@
 // 	protoc        v3.6.1
 // source: crawl.proto
 
-package crawler
+package proto
 
 import (
 	context "context"

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"shopee-crawler/crawler"
+	"shopee-crawler/proto"
 
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
@@ -22,7 +23,7 @@ func main() {
 		log.Fatalf("failed to serve: %s", err)
 	}
 	crawlServer := crawler.CrawlerServer{}
-	crawler.RegisterCrawCategoryServer(grpcServer, &crawlServer)
+	proto.RegisterCrawCategoryServer(grpcServer, &crawlServer)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}

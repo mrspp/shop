@@ -1,11 +1,14 @@
 package crawler
 
-import "context"
+import (
+	"context"
+	"shopee-crawler/proto"
+)
 
 type CrawlerServer struct {
 }
 
 // CrawCategory ...
-func (c *CrawlerServer) CrawCategory(ctx context.Context, blank *Blank) (*SuccessResponse, error) {
-	return &SuccessResponse{Success: true}, nil
+func (c *CrawlerServer) CrawCategory(ctx context.Context, blank *proto.Blank) (*proto.SuccessResponse, error) {
+	return &proto.SuccessResponse{Success: true}, nil
 }
